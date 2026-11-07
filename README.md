@@ -2,7 +2,7 @@
 
 Poster for chess.irl №4, 12 May 2026, Greenpoint, Brooklyn.
 
-The poster sets one character of the title on each piece left on the board at the end of Kasparov's win against Topalov, Wijk aan Zee 1999, after 44.Qa7: eleven pieces, eleven characters. The generator also carries his last game, Topalov–Kasparov, Linares 2005, and falls back to whichever game has a position with as many pieces as the title has characters. The squares behind the type are tinted by how often each square was occupied during the game. The info lines use the same squares on a smaller board at the bottom.
+The poster sets one character of the title on each piece left on the board at the end of Kasparov's win against Topalov, Wijk aan Zee 1999, after 44.Qa7: eleven pieces, eleven characters. The generator also carries his last game, Topalov–Kasparov, Linares 2005, and falls back to whichever game has a position with as many pieces as the title has characters. The squares behind the type are tinted by how often each square was occupied during the game, in one tint or stepping through the Displaay palette (brown, amber, orange, blue) by use; hairline outlines are a switch, off by default. The info lines use the same squares on a smaller board at the bottom.
 
 ## Files
 

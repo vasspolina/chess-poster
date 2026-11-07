@@ -184,17 +184,22 @@ details p{max-width:65ch}
   <fieldset>
     <legend>Board</legend>
     <div class="row">
-      <label><span class="lbl">Density pattern</span>
+      <label><span class="lbl">Squares</span>
         <select id="pattern">
-          <option value="squares">Triangles</option>
-          <option value="dots">Dots</option>
+          <option value="squares">Tinted by how often occupied</option>
           <option value="none">None</option>
         </select>
       </label>
-      <label><span class="lbl">Grid lines</span>
+      <label><span class="lbl">Square colours</span>
+        <select id="squareColours">
+          <option value="tint">One tint</option>
+          <option value="palette">Displaay palette by use: brown, amber, orange, blue</option>
+        </select>
+      </label>
+      <label><span class="lbl">Outlines</span>
         <select id="grid">
-          <option value="yes">Hairline grid</option>
           <option value="no">Off</option>
+          <option value="yes">Hairline grid</option>
         </select>
       </label>
       <label><span class="lbl">Mark last move</span>
@@ -383,7 +388,7 @@ details p{max-width:65ch}
       weight: serrif ? '300' : $('weight').value,
       titleScale: +$('titleScale').value/100,
       textPt: +$('textPt').value, smallPt: +$('smallPt').value,
-      pattern: $('pattern').value, grid: $('grid').value === 'yes',
+      pattern: $('pattern').value, grid: $('grid').value === 'yes', squareColours: $('squareColours').value,
       markLast: $('markLast').value, colorBy: $('colorBy').value, bgOn: $('bgOn').value === 'yes',
       density: +$('density').value/100,
       tint: $('tintHex').value, accent: $('accentHex').value, paper: $('paperHex').value, ink: $('inkHex').value,
@@ -418,19 +423,16 @@ details p{max-width:65ch}
     const sentence = s.infoLayout === 'sentence';
     if (s.bgOn) parts.push(`<rect width="${s.W}" height="${s.H}" fill="${esc(s.paper)}"/>`);
 
-    // density pattern
+    // squares, tinted by how often each was occupied; in palette mode the colour steps through the Displaay swatches by use
+    const BANDS = ['#A06F46', '#E79A3A', '#E27631', '#222FF4'];
+    const squareFill = d => s.squareColours === 'palette' ? BANDS[Math.min(3, Math.floor(d * 4 / Math.max(s.density, 0.2)))] : s.tint;
     if (s.pattern !== 'none'){
       for (let r=0;r<8;r++) for (let f=0;f<8;f++){
         const n = a.occ[FILES[f]+(8-r)] || 0; if (!n) continue;
         const d = a.positions ? n/a.positions : 0;
         const x = m + f*cell, y = topY + r*cell;
-        if (s.pattern === 'squares'){
-          const o = (0.06 + (s.density-0.06)*d).toFixed(3);
-          parts.push(`<polygon points="${x+cell/2},${y} ${x+cell},${y+cell} ${x},${y+cell}" fill="${esc(s.tint)}" fill-opacity="${o}"/>`);
-        } else {
-          const rad = cell*(0.05 + 0.42*d*s.density/0.6);
-          parts.push(`<circle cx="${x+cell/2}" cy="${y+cell/2}" r="${rad.toFixed(1)}" fill="${esc(s.tint)}" fill-opacity="0.9"/>`);
-        }
+        const o = (0.06 + (s.density-0.06)*d).toFixed(3);
+        parts.push(`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="${esc(squareFill(d))}" fill-opacity="${o}"/>`);
       }
     }
 
