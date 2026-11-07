@@ -44,6 +44,8 @@ input[type=range]{accent-color:var(--fg);width:100%}
 .swatches{display:flex;gap:6px;flex-wrap:wrap}
 .sw{width:26px;height:26px;border-radius:50%;border:1px solid var(--hair);padding:0;cursor:pointer;background:var(--c)}
 .sw[aria-pressed=true]{outline:1px solid var(--fg);outline-offset:2px}
+.grounds{gap:8px}
+.grounds .sw{width:48px;height:48px;border-radius:12px}
 .range{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
 .range > span.lbl{grid-column:1}
 .range output{grid-column:2;grid-row:1;font-variant-numeric:tabular-nums;color:var(--fg);justify-self:end}
@@ -93,7 +95,13 @@ details p{max-width:65ch}
     <label><span class="lbl">Moves (PGN or plain SAN)</span>
       <textarea id="moves" rows="5">1.e4 c5 2.Nf3 Nc6 3.Nc3 e5 4.Bc4 d6 5.d3 Be7 6.O-O Nf6 7.Nh4 Nd4 8.g3 Bg4 9.f3 Be6 10.Bg5 Ng8 11.Bxe7 Nxe7 12.f4 exf4 13.Bxe6 fxe6 14.Rxf4 Kd7 15.Nf3 Rf8 16.Rxf8 Qxf8 17.Nxd4 cxd4 18.Ne2 Qf6 19.c3 Rf8 20.Nxd4 Nc6 21.Qf1 Qxf1+ 22.Rxf1 Rxf1+ 23.Kxf1 Nxd4 24.cxd4 d5 25.Kf2 Ke7 26.Kf3 Kf6 27.h4 g6 28.b4 b5 29.Kf4 h6 30.Kg4</textarea>
     </label>
-    <p class="note">Default: Topalov–Kasparov, Linares 2005, Kasparov’s last game. Paste any game; the position after the last move is used.</p>
+    <label><span class="lbl">Position</span>
+      <select id="fit">
+        <option value="auto">Fits the title: the move after which as many pieces are left as the title has characters</option>
+        <option value="last">After the last move</option>
+      </select>
+    </label>
+    <p class="note">Default: Topalov–Kasparov, Linares 2005, Kasparov’s last game, 32 pieces down to 15. Any title of 15 to 32 characters finds its own position in it. Paste another game to use that instead.</p>
     <p class="warn" id="moveWarn" hidden></p>
   </fieldset>
 
@@ -159,9 +167,11 @@ details p{max-width:65ch}
       </label>
     </div>
     <label class="range"><span class="lbl">Title size</span><output id="titleScaleOut">110</output><input type="range" id="titleScale" min="60" max="160" value="110"></label>
+    <div id="boardSizes" hidden>
     <label class="range"><span class="lbl">Text size (pt)</span><output id="textPtOut">28</output><input type="range" id="textPt" min="10" max="60" value="28"></label>
     <label class="range"><span class="lbl">Small text (pt)</span><output id="smallPtOut">20</output><input type="range" id="smallPt" min="8" max="40" value="20"></label>
-    <p class="note">Ofform is Displaay’s 7×5 grid face: uppercase and lowercase share one height, so every piece sits the same way on its square. The sentence is set in Serrif Light and wraps to the board’s width. In board layout, small text is any item in brackets, like (live). Sizes are in points on the 900-wide poster and scale with the format.</p>
+    </div>
+    <p class="note">Ofform is Displaay’s 7×5 grid face: uppercase and lowercase share one height, so every piece sits the same way on its square. The sentence is set in Serrif Light at whatever size fills the space below the board: more text, smaller type. In board layout, small text is any item in brackets, like (live), and the sizes are in points on the 900-wide poster.</p>
   </fieldset>
 
   <fieldset>
@@ -199,6 +209,7 @@ details p{max-width:65ch}
 
   <fieldset>
     <legend>Colour</legend>
+    <label><span class="lbl">Ground: one of the Displaay colours, with ink, tint and accent to match</span><span class="swatches grounds" id="grounds"></span></label>
     <div class="row">
       <label><span class="lbl">Tint</span><span class="color"><input type="color" id="tint" value="#222FF4"><input type="text" id="tintHex" value="#222FF4"></span><span class="swatches" data-for="tint"></span></label>
       <label><span class="lbl">Accent</span><span class="color"><input type="color" id="accent" value="#E27631"><input type="text" id="accentHex" value="#E27631"></span><span class="swatches" data-for="accent"></span></label>
@@ -276,7 +287,7 @@ details p{max-width:65ch}
 
   // ---------- palette (Displaay swatches) ----------
   const PALETTE = [['#222FF4','Blue'],['#A06F46','Brown'],['#E79A3A','Amber'],['#E27631','Orange'],['#FFFFFF','White'],['#000000','Black']];
-  document.querySelectorAll('.swatches').forEach(wrap => {
+  document.querySelectorAll('.swatches[data-for]').forEach(wrap => {
     const id = wrap.dataset.for;
     PALETTE.forEach(([hex, name]) => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.style.setProperty('--c', hex);
@@ -284,8 +295,16 @@ details p{max-width:65ch}
       wrap.appendChild(b);
     });
   });
+  // grounds: paper, ink, tint, accent. Light grounds take black ink; the pattern is drawn in the ink unless the ground is black.
+  const GROUNDS = [['Black','#000000','#FFFFFF','#222FF4','#E27631'],['Blue','#222FF4','#FFFFFF','#FFFFFF','#E79A3A'],['Brown','#A06F46','#FFFFFF','#FFFFFF','#E79A3A'],['Amber','#E79A3A','#000000','#000000','#222FF4'],['Orange','#E27631','#000000','#000000','#222FF4']];
+  GROUNDS.forEach(([name, paper], i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.style.setProperty('--c', paper);
+    b.title = `${name} ground`; b.setAttribute('aria-label', `${name} ground`); b.dataset.ground = i;
+    $('grounds').appendChild(b);
+  });
   function syncSwatches(){
-    document.querySelectorAll('.sw').forEach(b => b.setAttribute('aria-pressed', String($(b.dataset.target+'Hex').value.toUpperCase() === b.dataset.hex)));
+    document.querySelectorAll('.sw[data-target]').forEach(b => b.setAttribute('aria-pressed', String($(b.dataset.target+'Hex').value.toUpperCase() === b.dataset.hex)));
+    document.querySelectorAll('.sw[data-ground]').forEach(b => b.setAttribute('aria-pressed', String($('paperHex').value.toUpperCase() === GROUNDS[+b.dataset.ground][1])));
   }
 
   // ---------- game analysis ----------
@@ -300,18 +319,30 @@ details p{max-width:65ch}
       .split(/\s+/).filter(Boolean);
   }
 
-  function analyse(text){
-    const result = {ok:false, error:'', positions:0, occ:{}, finalSquares:[], lastTo:null, plies:0, pieces:0};
+  // want: how many pieces the position should have (the title's character count), or 0 for the final position.
+  function analyse(text, want){
+    const result = {ok:false, error:'', positions:0, occ:{}, finalSquares:[], lastTo:null, lastSan:'', plies:0, pieces:0, totalPlies:0, fitted:false};
     if (typeof Chess !== 'function'){ result.error = 'The chess library did not load, so the moves cannot be replayed.'; return result; }
+    const sans = cleanMoves(text);
+    // first pass: legal moves and the piece count after each ply
+    const probe = new Chess(); const counts = [32]; const legal = [];
+    for (const san of sans){
+      const mv = probe.move(san, {sloppy:true});
+      if (!mv){ result.error = `Could not play “${san}” (move ${Math.floor(legal.length/2)+1}). The game up to that move is used.`; break; }
+      legal.push(san); counts.push(probe.board().flat().filter(Boolean).length);
+    }
+    let stop = legal.length;
+    if (want){ const k = counts.lastIndexOf(want); if (k >= 0){ stop = k; result.fitted = true; } }
+    result.totalPlies = legal.length;
+    // second pass: replay to that ply, counting occupation
     const game = new Chess();
     const occ = {};
     const count = () => { game.board().forEach((row, r) => row.forEach((cell, f) => { if (cell){ const sq = FILES[f] + (8 - r); occ[sq] = (occ[sq]||0) + 1; } })); };
     count();
     let positions = 1, lastTo = null, plies = 0;
-    for (const san of cleanMoves(text)){
+    for (const san of legal.slice(0, stop)){
       const mv = game.move(san, {sloppy:true});
-      if (!mv){ result.error = `Could not play “${san}” (move ${Math.floor(plies/2)+1}). The position up to that move is used.`; break; }
-      plies++; lastTo = mv.to; count(); positions++;
+      plies++; lastTo = mv.to; result.lastSan = (mv.color === 'w' ? Math.ceil(plies/2) + '.' : Math.ceil(plies/2) + '…') + mv.san; count(); positions++;
     }
     const finalSquares = [];
     const board = game.board(); // rank 8 first, files a..h
@@ -366,7 +397,9 @@ details p{max-width:65ch}
     const parts = [];
     const PC = Object.assign({p:s.ink}, PC_BASE);
     const isLast = p => p.sq === a.lastTo;
-    const colourOf = p => s.colorBy === 'piece' ? PC[p.piece.type] : ((s.markLast === 'yes' && isLast(p)) ? s.accent : s.ink);
+    const onFill = p => s.markLast === 'fill' && isLast(p);
+    const glyphOnFill = s.tint.toUpperCase() === s.ink.toUpperCase() ? s.paper : s.ink;
+    const colourOf = p => s.colorBy === 'piece' ? PC[p.piece.type] : (onFill(p) ? glyphOnFill : ((s.markLast === 'yes' && isLast(p)) ? s.accent : s.ink));
 
     const faces = (s.ofform ? OFFORM_FACE : '') + (s.serrif ? SERRIF_FACE : '');
     if (faces) parts.push(`<defs><style>${faces}</style></defs>`);
@@ -418,10 +451,12 @@ details p{max-width:65ch}
 
     // info as one sentence below the board: plain running text, wrapped to the board's width
     if (sentence){
-      const size = s.textPt * ptScale, lineH = size * 1.15;
       const date = s.date ? s.date + (/[.!?,:;]$/.test(s.date) ? '' : '.') : '';
-      const lines = wrapText([date, ...s.info].join(' '), s.infoFont, s.weight, size, boardW);
+      const availH = (s.H - m) - (topY + boardW + m * 0.6);
+      const fit = fitText([date, ...s.info].join(' '), s.infoFont, s.weight, boardW, availH);
+      const size = fit.size, lineH = size * 1.15, lines = fit.lines;
       const yLast = s.H - m - size * 0.22;
+      buildSvg.sentenceSize = Math.round(size / ptScale);
       lines.forEach((ln, i) => {
         const y = yLast - (lines.length - 1 - i) * lineH;
         parts.push(`<text x="${m}" y="${y.toFixed(1)}" font-family="${esc(s.infoFont)}" font-weight="${s.weight}" font-size="${size.toFixed(1)}" fill="${esc(s.ink)}">${esc(ln)}</text>`);
@@ -457,24 +492,44 @@ details p{max-width:65ch}
     return lines;
   }
 
+  // the largest size at which the text, wrapped to maxW, stands no taller than maxH
+  function fitText(text, font, weight, maxW, maxH){
+    const c = wrapText.c || (wrapText.c = document.createElement('canvas').getContext('2d'));
+    const fits = size => {
+      const lines = wrapText(text, font, weight, size, maxW);
+      c.font = `${weight} ${size}px ${font}`;
+      if (lines.some(l => c.measureText(l).width > maxW)) return null;
+      return (lines.length * 1.15 - 0.15) * size <= maxH ? lines : null;
+    };
+    let lo = 6, hi = Math.max(8, maxH), best = {size: lo, lines: wrapText(text, font, weight, lo, maxW)};
+    for (let i = 0; i < 24; i++){
+      const mid = (lo + hi) / 2, lines = fits(mid);
+      if (lines){ best = {size: mid, lines}; lo = mid; } else hi = mid;
+    }
+    best.size = Math.floor(best.size * 2) / 2;
+    best.lines = wrapText(text, font, weight, best.size, maxW);
+    return best;
+  }
+
   let currentSvg = '';
   function render(){
     const s = settings();
-    const a = analyse($('moves').value);
-    $('moveWarn').hidden = !a.error; $('moveWarn').textContent = a.error;
     const chars = Array.from(s.title.replace(/\s+/g,''));
+    const a = analyse($('moves').value, $('fit').value === 'auto' ? chars.length : 0);
+    $('moveWarn').hidden = !a.error; $('moveWarn').textContent = a.error;
     const tw = chars.length > a.pieces ? `The title has ${chars.length} characters but the position has ${a.pieces} pieces; the last ${chars.length-a.pieces} are left out.` : (chars.length < a.pieces ? `${a.pieces-chars.length} piece square${a.pieces-chars.length===1?'':'s'} left empty.` : '');
     $('titleWarn').hidden = !tw; $('titleWarn').textContent = tw;
     const nItems = s.date.split(/,\s*/).filter(Boolean).length + s.info.length;
     const iw = (s.infoLayout === 'board' && nItems > a.pieces) ? `${nItems} info items for ${a.pieces} pieces; the last ${nItems-a.pieces} are left out.` : '';
     $('infoWarn').hidden = !iw; $('infoWarn').textContent = iw;
+    $('boardSizes').hidden = s.infoLayout === 'sentence';
     currentSvg = buildSvg(a, s);
     $('frame').innerHTML = currentSvg;
     const sc = +$('scale').value;
     $('pngDim').textContent = `PNG · ${s.W*sc} × ${s.H*sc}`;
-    $('stats').innerHTML = `<dt>Plies</dt><dd>${a.plies}</dd><dt>Positions</dt><dd>${a.positions}</dd><dt>Pieces left</dt><dd>${a.pieces}</dd><dt>Last move to</dt><dd>${a.lastTo||'—'}</dd>`;
+    $('stats').innerHTML = `<dt>Position</dt><dd>${a.plies ? `after ${a.lastSan}` : 'start'}${a.fitted ? ', fits the title' : (a.plies < a.totalPlies ? '' : ', end of the game')}</dd><dt>Plies</dt><dd>${a.plies} of ${a.totalPlies}</dd><dt>Pieces</dt><dd>${a.pieces}</dd><dt>Last move to</dt><dd>${a.lastTo||'—'}</dd>`;
     const legend = s.colorBy==='piece' ? `<dt>Text colour</dt><dd class="legend"><i style="--c:#E27631">King</i><i style="--c:#E79A3A">Queen</i><i style="--c:#A06F46">Rook</i><i style="--c:#222FF4">Bishop</i><i style="--c:#8C8C8C">Knight</i><i style="--c:${esc(s.ink)}">Pawn</i></dd>` : '';
-    $('stats2').innerHTML = `<dt>Squares used</dt><dd>${Object.keys(a.occ).length} of 64</dd><dt>Title face</dt><dd>${$('font').value==='ofform' ? 'Ofform, Displaay' : esc(s.font.split(',')[0].replace(/['"]/g,''))}</dd><dt>Info face</dt><dd>${$('infoFont').value==='serrif' ? 'Serrif Light, Displaay' : esc(s.infoFont.split(',')[0].replace(/['"]/g,''))}</dd><dt>Format</dt><dd>${s.W} × ${s.H}</dd>${legend}`;
+    $('stats2').innerHTML = `<dt>Squares used</dt><dd>${Object.keys(a.occ).length} of 64</dd><dt>Title face</dt><dd>${$('font').value==='ofform' ? 'Ofform, Displaay' : esc(s.font.split(',')[0].replace(/['"]/g,''))}</dd><dt>Info face</dt><dd>${$('infoFont').value==='serrif' ? 'Serrif Light, Displaay' : esc(s.infoFont.split(',')[0].replace(/['"]/g,''))}${s.infoLayout==='sentence' && buildSvg.sentenceSize ? `, ${buildSvg.sentenceSize} pt to fill` : ''}</dd><dt>Format</dt><dd>${s.W} × ${s.H}</dd>${legend}`;
     syncSwatches();
   }
 
@@ -490,7 +545,11 @@ details p{max-width:65ch}
   });
   form.addEventListener('click', e => {
     const b = e.target.closest('.sw'); if (!b) return;
-    $(b.dataset.target).value = b.dataset.hex; $(b.dataset.target+'Hex').value = b.dataset.hex; render();
+    if (b.dataset.ground){
+      const [, paper, ink, tint, accent] = GROUNDS[+b.dataset.ground];
+      [['paper', paper], ['ink', ink], ['tint', tint], ['accent', accent]].forEach(([id, hex]) => { $(id).value = hex; $(id+'Hex').value = hex; });
+    } else { $(b.dataset.target).value = b.dataset.hex; $(b.dataset.target+'Hex').value = b.dataset.hex; }
+    render();
   });
   form.addEventListener('submit', e => e.preventDefault());
 
