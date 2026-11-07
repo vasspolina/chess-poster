@@ -92,8 +92,15 @@ details p{max-width:65ch}
 <form class="panel" id="controls" autocomplete="off">
   <fieldset>
     <legend>Game</legend>
+    <label><span class="lbl">Game</span>
+      <select id="game">
+        <option value="wijk1999">Kasparov–Topalov, Wijk aan Zee 1999, Kasparov’s win</option>
+        <option value="linares2005">Topalov–Kasparov, Linares 2005, Kasparov’s last game</option>
+        <option value="custom">Custom, pasted below</option>
+      </select>
+    </label>
     <label><span class="lbl">Moves (PGN or plain SAN)</span>
-      <textarea id="moves" rows="5">1.e4 c5 2.Nf3 Nc6 3.Nc3 e5 4.Bc4 d6 5.d3 Be7 6.O-O Nf6 7.Nh4 Nd4 8.g3 Bg4 9.f3 Be6 10.Bg5 Ng8 11.Bxe7 Nxe7 12.f4 exf4 13.Bxe6 fxe6 14.Rxf4 Kd7 15.Nf3 Rf8 16.Rxf8 Qxf8 17.Nxd4 cxd4 18.Ne2 Qf6 19.c3 Rf8 20.Nxd4 Nc6 21.Qf1 Qxf1+ 22.Rxf1 Rxf1+ 23.Kxf1 Nxd4 24.cxd4 d5 25.Kf2 Ke7 26.Kf3 Kf6 27.h4 g6 28.b4 b5 29.Kf4 h6 30.Kg4</textarea>
+      <textarea id="moves" rows="5">1.e4 d6 2.d4 Nf6 3.Nc3 g6 4.Be3 Bg7 5.Qd2 c6 6.f3 b5 7.Nge2 Nbd7 8.Bh6 Bxh6 9.Qxh6 Bb7 10.a3 e5 11.O-O-O Qe7 12.Kb1 a6 13.Nc1 O-O-O 14.Nb3 exd4 15.Rxd4 c5 16.Rd1 Nb6 17.g3 Kb8 18.Na5 Ba8 19.Bh3 d5 20.Qf4+ Ka7 21.Rhe1 d4 22.Nd5 Nbxd5 23.exd5 Qd6 24.Rxd4 cxd4 25.Re7+ Kb6 26.Qxd4+ Kxa5 27.b4+ Ka4 28.Qc3 Qxd5 29.Ra7 Bb7 30.Rxb7 Qc4 31.Qxf6 Kxa3 32.Qxa6+ Kxb4 33.c3+ Kxc3 34.Qa1+ Kd2 35.Qb2+ Kd1 36.Bf1 Rd2 37.Rd7 Rxd7 38.Bxc4 bxc4 39.Qxh8 Rd3 40.Qa8 c3 41.Qa4+ Ke1 42.f4 f5 43.Kc1 Rd2 44.Qa7</textarea>
     </label>
     <label><span class="lbl">Position</span>
       <select id="fit">
@@ -101,14 +108,14 @@ details p{max-width:65ch}
         <option value="last">After the last move</option>
       </select>
     </label>
-    <p class="note">Default: Topalov–Kasparov, Linares 2005, Kasparov’s last game, 32 pieces down to 15. Any title of 15 to 32 characters finds its own position in it. Paste another game to use that instead.</p>
+    <p class="note">The 1999 win runs from 32 pieces down to 11, the 2005 game down to 15. A title whose length has no position in the chosen game takes the other Kasparov game. Edit the moves to use any other game.</p>
     <p class="warn" id="moveWarn" hidden></p>
   </fieldset>
 
   <fieldset>
     <legend>Text</legend>
     <label><span class="lbl">Title, one character per piece (spaces are skipped)</span>
-      <input type="text" id="title" value="chess.irl №4 2026">
+      <input type="text" id="title" value="chess.irl №4">
     </label>
     <p class="warn" id="titleWarn" hidden></p>
     <label><span class="lbl">Info layout</span>
@@ -121,7 +128,7 @@ details p{max-width:65ch}
       <input type="text" id="date" value="12/05/2026, 7pm">
     </label>
     <label><span class="lbl">Info (in board layout, one item per line)</span>
-      <textarea id="info" rows="4">RSVP for address. Greenpoint, Brooklyn. Anya Tran (live), Daren Ho (live), Iggy Nuclear (dj), Sofiya V (dj).</textarea>
+      <textarea id="info" rows="4">RSVP for address. Greenpoint, Brooklyn. Anya Tran (live), Daren Ho (live), Iggy Nuclear (dj), Sofiya V (dj).</textarea>
     </label>
     <p class="warn" id="infoWarn" hidden></p>
   </fieldset>
@@ -228,11 +235,9 @@ details p{max-width:65ch}
     <div class="row">
       <label><span class="lbl">Size</span>
         <select id="size">
-          <option value="900x1200">3:4 · 900 × 1200</option>
-          <option value="1000x1414">A-series · 1000 × 1414</option>
-          <option value="1080x1350">Portrait post · 1080 × 1350</option>
-          <option value="1080x1920">Story · 1080 × 1920</option>
-          <option value="1000x1000">Square · 1000 × 1000</option>
+          <option value="1080x1350">Instagram post · 1080 × 1350</option>
+          <option value="1080x1920">Instagram story · 1080 × 1920</option>
+          <option value="1000x1414">RA poster · A series, 1000 × 1414</option>
         </select>
       </label>
       <label><span class="lbl">Export scale</span>
@@ -247,7 +252,7 @@ details p{max-width:65ch}
   </fieldset>
 
   <div class="tiles">
-    <button type="button" class="tile" id="savePng">Save<small id="pngDim">PNG · 1800 × 2400</small></button>
+    <button type="button" class="tile" id="savePng">Save<small id="pngDim">PNG · 2160 × 2700</small></button>
     <button type="button" class="tile blue" id="saveSvg">Save<small>SVG, vector</small></button>
     <button type="button" class="tile orange" id="copySvg">Copy<small>SVG code</small></button>
   </div>
@@ -306,6 +311,13 @@ details p{max-width:65ch}
     document.querySelectorAll('.sw[data-target]').forEach(b => b.setAttribute('aria-pressed', String($(b.dataset.target+'Hex').value.toUpperCase() === b.dataset.hex)));
     document.querySelectorAll('.sw[data-ground]').forEach(b => b.setAttribute('aria-pressed', String($('paperHex').value.toUpperCase() === GROUNDS[+b.dataset.ground][1])));
   }
+
+  // ---------- games ----------
+  const GAMES = {
+    wijk1999: {name: 'Kasparov–Topalov, Wijk aan Zee 1999', moves: `1.e4 d6 2.d4 Nf6 3.Nc3 g6 4.Be3 Bg7 5.Qd2 c6 6.f3 b5 7.Nge2 Nbd7 8.Bh6 Bxh6 9.Qxh6 Bb7 10.a3 e5 11.O-O-O Qe7 12.Kb1 a6 13.Nc1 O-O-O 14.Nb3 exd4 15.Rxd4 c5 16.Rd1 Nb6 17.g3 Kb8 18.Na5 Ba8 19.Bh3 d5 20.Qf4+ Ka7 21.Rhe1 d4 22.Nd5 Nbxd5 23.exd5 Qd6 24.Rxd4 cxd4 25.Re7+ Kb6 26.Qxd4+ Kxa5 27.b4+ Ka4 28.Qc3 Qxd5 29.Ra7 Bb7 30.Rxb7 Qc4 31.Qxf6 Kxa3 32.Qxa6+ Kxb4 33.c3+ Kxc3 34.Qa1+ Kd2 35.Qb2+ Kd1 36.Bf1 Rd2 37.Rd7 Rxd7 38.Bxc4 bxc4 39.Qxh8 Rd3 40.Qa8 c3 41.Qa4+ Ke1 42.f4 f5 43.Kc1 Rd2 44.Qa7`},
+    linares2005: {name: 'Topalov–Kasparov, Linares 2005', moves: `1.e4 c5 2.Nf3 Nc6 3.Nc3 e5 4.Bc4 d6 5.d3 Be7 6.O-O Nf6 7.Nh4 Nd4 8.g3 Bg4 9.f3 Be6 10.Bg5 Ng8 11.Bxe7 Nxe7 12.f4 exf4 13.Bxe6 fxe6 14.Rxf4 Kd7 15.Nf3 Rf8 16.Rxf8 Qxf8 17.Nxd4 cxd4 18.Ne2 Qf6 19.c3 Rf8 20.Nxd4 Nc6 21.Qf1 Qxf1+ 22.Rxf1 Rxf1+ 23.Kxf1 Nxd4 24.cxd4 d5 25.Kf2 Ke7 26.Kf3 Kf6 27.h4 g6 28.b4 b5 29.Kf4 h6 30.Kg4`},
+  };
+  const OTHER = {wijk1999: 'linares2005', linares2005: 'wijk1999'};
 
   // ---------- game analysis ----------
   function cleanMoves(text){
@@ -484,7 +496,7 @@ details p{max-width:65ch}
     const c = wrapText.c || (wrapText.c = document.createElement('canvas').getContext('2d'));
     c.font = `${weight} ${size}px ${font}`;
     const lines = []; let line = '';
-    for (const w of text.split(/\s+/).filter(Boolean)){
+    for (const w of text.split(/[ \t\r\n]+/).filter(Boolean)){
       const t = line ? line + ' ' + w : w;
       if (line && c.measureText(t).width > maxW){ lines.push(line); line = w; } else line = t;
     }
@@ -515,7 +527,12 @@ details p{max-width:65ch}
   function render(){
     const s = settings();
     const chars = Array.from(s.title.replace(/\s+/g,''));
-    const a = analyse($('moves').value, $('fit').value === 'auto' ? chars.length : 0);
+    const want = $('fit').value === 'auto' ? chars.length : 0;
+    let a = analyse($('moves').value, want), gameName = $('game').value === 'custom' ? 'the pasted game' : GAMES[$('game').value].name;
+    if (want && !a.fitted && OTHER[$('game').value]){
+      const other = OTHER[$('game').value], b = analyse(GAMES[other].moves, want);
+      if (b.fitted){ a = b; gameName = GAMES[other].name; a.switched = true; }
+    }
     $('moveWarn').hidden = !a.error; $('moveWarn').textContent = a.error;
     const tw = chars.length > a.pieces ? `The title has ${chars.length} characters but the position has ${a.pieces} pieces; the last ${chars.length-a.pieces} are left out.` : (chars.length < a.pieces ? `${a.pieces-chars.length} piece square${a.pieces-chars.length===1?'':'s'} left empty.` : '');
     $('titleWarn').hidden = !tw; $('titleWarn').textContent = tw;
@@ -527,7 +544,7 @@ details p{max-width:65ch}
     $('frame').innerHTML = currentSvg;
     const sc = +$('scale').value;
     $('pngDim').textContent = `PNG · ${s.W*sc} × ${s.H*sc}`;
-    $('stats').innerHTML = `<dt>Position</dt><dd>${a.plies ? `after ${a.lastSan}` : 'start'}${a.fitted ? ', fits the title' : (a.plies < a.totalPlies ? '' : ', end of the game')}</dd><dt>Plies</dt><dd>${a.plies} of ${a.totalPlies}</dd><dt>Pieces</dt><dd>${a.pieces}</dd><dt>Last move to</dt><dd>${a.lastTo||'—'}</dd>`;
+    $('stats').innerHTML = `<dt>Game</dt><dd>${esc(gameName)}${a.switched ? ', taken because the title fits it' : ''}</dd><dt>Position</dt><dd>${a.plies ? `after ${a.lastSan}` : 'start'}${a.fitted ? ', fits the title' : (a.plies < a.totalPlies ? '' : ', end of the game')}</dd><dt>Plies</dt><dd>${a.plies} of ${a.totalPlies}</dd><dt>Pieces</dt><dd>${a.pieces}</dd><dt>Last move to</dt><dd>${a.lastTo||'—'}</dd>`;
     const legend = s.colorBy==='piece' ? `<dt>Text colour</dt><dd class="legend"><i style="--c:#E27631">King</i><i style="--c:#E79A3A">Queen</i><i style="--c:#A06F46">Rook</i><i style="--c:#222FF4">Bishop</i><i style="--c:#8C8C8C">Knight</i><i style="--c:${esc(s.ink)}">Pawn</i></dd>` : '';
     $('stats2').innerHTML = `<dt>Squares used</dt><dd>${Object.keys(a.occ).length} of 64</dd><dt>Title face</dt><dd>${$('font').value==='ofform' ? 'Ofform, Displaay' : esc(s.font.split(',')[0].replace(/['"]/g,''))}</dd><dt>Info face</dt><dd>${$('infoFont').value==='serrif' ? 'Serrif Light, Displaay' : esc(s.infoFont.split(',')[0].replace(/['"]/g,''))}${s.infoLayout==='sentence' && buildSvg.sentenceSize ? `, ${buildSvg.sentenceSize} pt to fill` : ''}</dd><dt>Format</dt><dd>${s.W} × ${s.H}</dd>${legend}`;
     syncSwatches();
@@ -541,6 +558,8 @@ details p{max-width:65ch}
     if (t.id.endsWith('Hex') && /^#[0-9a-f]{6}$/i.test(t.value)){ $(t.id.replace('Hex','')).value = t.value; }
     if (t.type === 'range'){ $(t.id+'Out').value = t.value; }
     if (t.id === 'font'){ $('customFontWrap').hidden = t.value !== 'custom'; }
+    if (t.id === 'game' && GAMES[t.value]){ $('moves').value = GAMES[t.value].moves; }
+    if (t.id === 'moves'){ $('game').value = 'custom'; }
     render();
   });
   form.addEventListener('click', e => {
